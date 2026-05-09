@@ -619,7 +619,7 @@ function updateFee(){
   if(pinLat===null)return;
   const pdType=document.getElementById('pd-type').value;
   const dist=haversine(STORE.lat,STORE.lng,pinLat,pinLng);
-  const extra=Math.max(0,dist-FREE_KM);const fee=extra>0?Math.ceil(extra)*FPK:0;
+  const extra=Math.max(0,dist-FREE_KM);const fee=extra>0?Math.round(extra*10)/10*FPK:0;
   const pickupFee=pdType==='delivery'?0:fee;
   const deliveryFee=pdType==='pickup'?0:fee;
   delCharge=pickupFee+deliveryFee;
