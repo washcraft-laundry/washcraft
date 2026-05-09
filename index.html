@@ -406,6 +406,8 @@ footer{text-align:center;color:rgba(255,255,255,.2);font-size:12px;padding:16px 
   <input type="hidden" id="pin-lat"/><input type="hidden" id="pin-lng"/>
   <div class="fee-box" style="margin-top:12px;" id="fee-box-wrap">
     <div class="fee-row"><span>Distance from our store</span><span id="f-dist">— Drop a pin first</span></div>
+    <div class="fee-row" id="fee-full-row" style="display:none"><span>Full distance charge</span><span id="f-full">—</span></div>
+    <div class="fee-row" id="fee-discount-row" style="display:none;color:var(--success)"><span>🎉 Free 1km discount</span><span id="f-discount">—</span></div>
     <div class="fee-row" id="fee-pickup-row"><span>Pickup fee</span><span id="f-pickup">—</span></div>
     <div class="fee-row" id="fee-delivery-row"><span>Delivery fee</span><span id="f-delivery">—</span></div>
     <div class="fee-row total"><span>Total delivery charge</span><span id="f-total">—</span></div>
@@ -618,21 +620,54 @@ function initMap(){
 function updateFee(){
   if(pinLat===null)return;
   const pdType=document.getElementById('pd-type').value;
-  const dist=haversine(STORE.lat,STORE.lng,pinLat,pinLng);
-  const extra=Math.max(0,dist-FREE_KM);const fee=extra>0?Math.round(extra*10)/10*FPK:0;
-  const pickupFee=pdType==='delivery'?0:fee;
-  const deliveryFee=pdType==='pickup'?0:fee;
-  delCharge=pickupFee+deliveryFee;
-  document.getElementById('f-dist').textContent=dist.toFixed(2)+' km';
-  const fmt=v=>v===0?'<span class="free-badge">FREE 🎉</span>':'₱'+v;
-  if(pdType!=='delivery') document.getElementById('f-pickup').innerHTML=fmt(pickupFee);
-  if(pdType!=='pickup') document.getElementById('f-delivery').innerHTML=fmt(deliveryFee);
-  document.getElementById('f-dist').textContent=dist.toFixed(2)+' km (road distance)';
-  document.getElementById('f-total').innerHTML=delCharge===0?'<span class="free-badge">FREE — within 1 km! 🎉</span>':'₱'+delCharge;
-  calcSummary();
-  }); // end DistanceMatrixService callback
+  document.getElementById('f-dist').textContent='Calculating...';
+  document.getElementById('f-pickup').textContent='...';
+  document.getElementById('f-delivery').textContent='...';
+  document.getElementById('f-total').textContent='...';
+  const service=new google.maps.DistanceMatrixService();
+  service.getDistanceMatrix({
+    origins:[new google.maps.LatLng(STORE.lat,STORE.lng)],
+    destinations:[new google.maps.LatLng(pinLat,pinLng)],
+    travelMode:google.maps.TravelMode.DRIVING,
+    unitSystem:google.maps.UnitSystem.METRIC
+  },function(response,status){
+    let dist;
+    if(status==='OK'&&response.rows[0].elements[0].status==='OK'){
+      dist=response.rows[0].elements[0].distance.value/1000;
+    } else {
+      dist=haversine(STORE.lat,STORE.lng,pinLat,pinLng);
+    }
+    const roundedDist=Math.round(dist*10)/10;
+    const extra=Math.max(0,roundedDist-FREE_KM);
+    const fee=extra>0?Math.round(extra*10)/10*FPK:0;
+    const pickupFee=pdType==='delivery'?0:fee;
+    const deliveryFee=pdType==='pickup'?0:fee;
+    delCharge=pickupFee+deliveryFee;
+    document.getElementById('f-dist').textContent=roundedDist.toFixed(1)+' km';
+    const fmt=v=>v===0?'<span class="free-badge">FREE 🎉</span>':'\u20b1'+v;
+    if(pdType!=='delivery') document.getElementById('f-pickup').innerHTML=fmt(pickupFee);
+    if(pdType!=='pickup') document.getElementById('f-delivery').innerHTML=fmt(deliveryFee);
+    if(delCharge===0){
+      document.getElementById('fee-full-row').style.display='none';
+      document.getElementById('fee-discount-row').style.display='none';
+      document.getElementById('f-total').innerHTML='<span class="free-badge">FREE \u2014 within 1 km! \ud83c\udf89</span>';
+    } else {
+      const fullCharge=Math.round(roundedDist*FPK*10)/10;
+      const discountCharge=FREE_KM>0?Math.round(FREE_KM*FPK*10)/10:0;
+      if(discountCharge>0){
+        document.getElementById('fee-full-row').style.display='flex';
+        document.getElementById('f-full').textContent='\u20b1'+fullCharge.toFixed(0)+' ('+roundedDist.toFixed(1)+' km \u00d7 \u20b1'+FPK+')';
+        document.getElementById('fee-discount-row').style.display='flex';
+        document.getElementById('f-discount').textContent='-\u20b1'+discountCharge.toFixed(0)+' ('+FREE_KM+' km free)';
+      } else {
+        document.getElementById('fee-full-row').style.display='none';
+        document.getElementById('fee-discount-row').style.display='none';
+      }
+      document.getElementById('f-total').textContent='\u20b1'+delCharge;
+    }
+    calcSummary();
+  });
 }
-
 // SUMMARY CALC
 function calcSummary(){
   const type=document.getElementById('svc-type').value;
