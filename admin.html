@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WashCraft Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#0a1628;--blue:#1a3a8f;--bright:#2563eb;--sky:#60a5fa;--ice:#dbeafe;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;--success:#059669;--radius:16px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.bg{position:fixed;inset:0;z-index:0;background:linear-gradient(135deg,#0a1628 0%,#0f2d6e 50%,#0a1628 100%);}
+.bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(37,99,235,.3),transparent 70%);}
+.wrapper{position:relative;z-index:1;width:100%;max-width:460px;}
+
+/* LOGIN */
+#login-screen{background:rgba(255,255,255,.97);border-radius:var(--radius);padding:36px;box-shadow:0 4px 24px rgba(0,0,0,.3);}
+.admin-logo{text-align:center;margin-bottom:24px;}
+.admin-logo .icon{font-size:48px;display:block;margin-bottom:8px;}
+.admin-logo h1{font-family:'Playfair Display',serif;font-size:22px;color:var(--blue);}
+.admin-logo p{font-size:13px;color:var(--muted);margin-top:4px;}
+.field{margin-bottom:16px;}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);background:#f8fafc;outline:none;transition:border .2s;}
+input:focus{border-color:var(--bright);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff;}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--bright));color:#fff;border:none;border-radius:12px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 4px 16px rgba(37,99,235,.4);}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.5);}
+.login-error{color:#ef4444;font-size:13px;text-align:center;margin-top:10px;display:none;}
+
+/* ADMIN PANEL */
+#admin-screen{display:none;}
+.admin-header{background:rgba(255,255,255,.97);border-radius:var(--radius);padding:20px 24px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 24px rgba(0,0,0,.2);}
+.admin-header-left{display:flex;align-items:center;gap:12px;}
+.admin-avatar{width:40px;height:40px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.admin-header h2{font-family:'Playfair Display',serif;font-size:17px;color:var(--blue);margin:0;}
+.admin-header p{font-size:12px;color:var(--muted);margin:0;}
+.logout-btn{font-size:13px;color:var(--muted);background:none;border:1px solid var(--border);padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .2s;}
+.logout-btn:hover{color:#ef4444;border-color:#ef4444;}
+
+.card{background:rgba(255,255,255,.97);border-radius:var(--radius);padding:24px;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,.2);}
+.card-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--blue);margin-bottom:6px;}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+
+.setting-row{background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:12px;}
+.setting-row:last-child{margin-bottom:0;}
+.setting-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.setting-input-wrap{display:flex;align-items:center;gap:8px;}
+.setting-input-wrap span{font-size:14px;color:var(--muted);}
+.setting-input-wrap input{width:90px;font-size:18px;font-weight:600;color:var(--blue);padding:8px 12px;}
+.setting-desc{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;}
+
+/* PREVIEW */
+.preview-box{background:linear-gradient(135deg,var(--ice),#eff6ff);border:1.5px solid var(--sky);border-radius:12px;padding:16px;margin-top:16px;}
+.preview-title{font-size:12px;font-weight:600;color:var(--blue);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.preview-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0;border-bottom:1px solid rgba(96,165,250,.3);}
+.preview-row:last-child{border:none;}
+.preview-row span:first-child{color:var(--muted);}
+.preview-row span:last-child{font-weight:600;}
+.free-tag{background:#dcfce7;color:var(--success);font-size:12px;padding:1px 8px;border-radius:20px;font-weight:600;}
+
+/* SAVE */
+.save-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--blue),var(--bright));color:#fff;border:none;border-radius:12px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 4px 16px rgba(37,99,235,.4);margin-top:4px;}
+.save-btn:hover{transform:translateY(-1px);}
+.save-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+.save-msg{display:none;text-align:center;font-size:14px;color:var(--success);padding:12px;background:#f0fdf4;border-radius:10px;margin-top:12px;border:1px solid #86efac;}
+.save-err{display:none;text-align:center;font-size:14px;color:#ef4444;padding:12px;background:#fef2f2;border-radius:10px;margin-top:12px;border:1px solid #fca5a5;}
+
+/* LOADING */
+.loading-overlay{display:none;text-align:center;padding:20px;color:rgba(255,255,255,.7);font-size:14px;}
+
+/* BOOKING LINK */
+.link-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.link-card p{color:rgba(255,255,255,.7);font-size:13px;margin:0;}
+.link-card a{color:var(--sky);font-size:13px;text-decoration:none;font-weight:500;}
+.link-card a:hover{color:#fff;}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrapper">
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="admin-logo">
+    <span class="icon">🧺</span>
+    <h1>WashCraft Admin</h1>
+    <p>Sign in to manage your settings</p>
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')login()"/>
+  </div>
+  <button class="login-btn" onclick="login()">Sign In →</button>
+  <p class="login-error" id="login-error">❌ Incorrect password. Please try again.</p>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-screen">
+
+  <div class="admin-header">
+    <div class="admin-header-left">
+      <div class="admin-avatar">🧺</div>
+      <div>
+        <h2>WashCraft Admin</h2>
+        <p>Delivery pricing settings</p>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sign out</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🚗 Delivery pricing</div>
+    <p class="card-sub">Changes apply immediately to all new bookings on your booking page — no re-uploading needed.</p>
+
+    <div class="loading-overlay" id="loading-msg">⏳ Loading current settings...</div>
+
+    <div id="settings-form">
+      <div class="setting-row">
+        <div class="setting-label">Free delivery radius</div>
+        <div class="setting-input-wrap">
+          <input type="number" id="free-km" min="0" step="0.5" value="1" oninput="updatePreview()"/>
+          <span>km from store</span>
+        </div>
+        <p class="setting-desc">Customers within this distance pay no pickup or delivery fee.</p>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-label">Fee per km — pickup</div>
+        <div class="setting-input-wrap">
+          <span>₱</span>
+          <input type="number" id="pickup-fee" min="0" step="5" value="10" oninput="updatePreview()"/>
+          <span>per km after free zone</span>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-label">Fee per km — delivery</div>
+        <div class="setting-input-wrap">
+          <span>₱</span>
+          <input type="number" id="delivery-fee" min="0" step="5" value="10" oninput="updatePreview()"/>
+          <span>per km after free zone</span>
+        </div>
+      </div>
+
+      <div class="preview-box">
+        <div class="preview-title">👁️ Live preview — what customers see</div>
+        <div id="preview-rows"></div>
+      </div>
+
+      <button class="save-btn" id="save-btn" onclick="saveSettings()">💾 Save Changes</button>
+      <div class="save-msg" id="save-msg">✅ Settings saved! Your booking page is now updated.</div>
+      <div class="save-err" id="save-err">❌ Failed to save. Please check your connection and try again.</div>
+    </div>
+  </div>
+
+  <div class="link-card">
+    <p>🌐 Your live booking page</p>
+    <a href="https://washcraft-laundry.github.io/washcraft/" target="_blank">washcraft-laundry.github.io/washcraft/ ↗</a>
+  </div>
+
+</div>
+</div>
+
+<script>
+const SUPABASE_URL='https://lzdvdoomxverukxrbknk.supabase.co';
+const SUPABASE_KEY='sb_publishable_g4eml-nrxITD4nT1eNsA3w_iUHuFLAx';
+const ADMIN_PASSWORD='washcraft2025';
+
+function login(){
+  const pw=document.getElementById('password').value;
+  if(pw===ADMIN_PASSWORD){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-screen').style.display='block';
+    loadSettings();
+  } else {
+    document.getElementById('login-error').style.display='block';
+    document.getElementById('password').value='';
+    document.getElementById('password').focus();
+  }
+}
+
+function logout(){
+  document.getElementById('admin-screen').style.display='none';
+  document.getElementById('login-screen').style.display='block';
+  document.getElementById('password').value='';
+}
+
+async function loadSettings(){
+  document.getElementById('loading-msg').style.display='block';
+  document.getElementById('settings-form').style.opacity='.4';
+  try{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/pricing?id=eq.1&select=free_km,pickup_fee,delivery_fee',{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+    });
+    const d=await r.json();
+    if(d&&d[0]){
+      document.getElementById('free-km').value=d[0].free_km;
+      document.getElementById('pickup-fee').value=d[0].pickup_fee;
+      document.getElementById('delivery-fee').value=d[0].delivery_fee;
+      updatePreview();
+    }
+  }catch(e){console.log('Load error:',e);}
+  document.getElementById('loading-msg').style.display='none';
+  document.getElementById('settings-form').style.opacity='1';
+}
+
+async function saveSettings(){
+  const btn=document.getElementById('save-btn');
+  const saveMsg=document.getElementById('save-msg');
+  const saveErr=document.getElementById('save-err');
+  saveMsg.style.display='none';
+  saveErr.style.display='none';
+  btn.disabled=true;
+  btn.textContent='Saving...';
+  const freeKm=parseFloat(document.getElementById('free-km').value)||1;
+  const pickupFee=parseFloat(document.getElementById('pickup-fee').value)||10;
+  const deliveryFee=parseFloat(document.getElementById('delivery-fee').value)||10;
+  try{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/pricing?id=eq.1',{
+      method:'PATCH',
+      headers:{
+        'apikey':SUPABASE_KEY,
+        'Authorization':'Bearer '+SUPABASE_KEY,
+        'Content-Type':'application/json',
+        'Prefer':'return=minimal'
+      },
+      body:JSON.stringify({free_km:freeKm,pickup_fee:pickupFee,delivery_fee:deliveryFee,updated_at:new Date().toISOString()})
+    });
+    if(r.ok){
+      saveMsg.style.display='block';
+      setTimeout(()=>saveMsg.style.display='none',4000);
+    } else {
+      saveErr.style.display='block';
+    }
+  }catch(e){
+    saveErr.style.display='block';
+  }
+  btn.disabled=false;
+  btn.textContent='💾 Save Changes';
+}
+
+function updatePreview(){
+  const freeKm=parseFloat(document.getElementById('free-km').value)||1;
+  const pFee=parseFloat(document.getElementById('pickup-fee').value)||0;
+  const dFee=parseFloat(document.getElementById('delivery-fee').value)||0;
+  const rows=document.getElementById('preview-rows');
+  const examples=[1,2,3,5,10];
+  rows.innerHTML=examples.map(km=>{
+    const extra=Math.max(0,km-freeKm);
+    const pickupCharge=extra>0?Math.ceil(extra)*pFee:0;
+    const deliveryCharge=extra>0?Math.ceil(extra)*dFee:0;
+    const total=pickupCharge+deliveryCharge;
+    const isFree=total===0;
+    return `<div class="preview-row">
+      <span>${km} km away</span>
+      <span>${isFree?'<span class="free-tag">FREE</span>':'₱'+total+' total (₱'+pickupCharge+' pickup + ₱'+deliveryCharge+' delivery)'}</span>
+    </div>`;
+  }).join('');
+}
+
+// Focus password on load
+document.getElementById('password').focus();
+updatePreview();
+</script>
+</body>
+</html>

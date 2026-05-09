@@ -586,7 +586,20 @@ function renderAddonQty(){
 function adjAO(key,d){if(!AO[key])return;AO[key].qty=Math.max(1,AO[key].qty+d);document.getElementById('aoq-'+key.replace(/\s/g,'_')).textContent=AO[key].qty;calcSummary();}
 
 // MAP
-const STORE={lat:15.4831,lng:120.9673};const FREE_KM=1,FPK=10;
+const STORE={lat:15.4831,lng:120.9673};
+let FREE_KM=1,FPK=10;
+const SUPABASE_URL='https://lzdvdoomxverukxrbknk.supabase.co';
+const SUPABASE_KEY='sb_publishable_g4eml-nrxITD4nT1eNsA3w_iUHuFLAx';
+async function loadPricing(){
+  try{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/pricing?id=eq.1&select=free_km,pickup_fee,delivery_fee',{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+    });
+    const d=await r.json();
+    if(d&&d[0]){FREE_KM=d[0].free_km;FPK=d[0].pickup_fee;}
+  }catch(e){console.log('Using default pricing');}
+}
+loadPricing();
 let map,marker,pinLat=null,pinLng=null,delCharge=0;
 function haversine(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dG=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dG/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 function initMap(){
