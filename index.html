@@ -627,8 +627,10 @@ function updateFee(){
   const fmt=v=>v===0?'<span class="free-badge">FREE 🎉</span>':'₱'+v;
   if(pdType!=='delivery') document.getElementById('f-pickup').innerHTML=fmt(pickupFee);
   if(pdType!=='pickup') document.getElementById('f-delivery').innerHTML=fmt(deliveryFee);
+  document.getElementById('f-dist').textContent=dist.toFixed(2)+' km (road distance)';
   document.getElementById('f-total').innerHTML=delCharge===0?'<span class="free-badge">FREE — within 1 km! 🎉</span>':'₱'+delCharge;
   calcSummary();
+  }); // end DistanceMatrixService callback
 }
 
 // SUMMARY CALC
@@ -707,7 +709,7 @@ function submitBooking(){
   const aoParts=Object.keys(AO).map(k=>k+'×'+AO[k].qty+' (₱'+(AO[k].price*AO[k].qty)+')');
 
   // Distance & fee
-  const dist=haversine(STORE.lat,STORE.lng,pinLat,pinLng).toFixed(2);
+  const dist=document.getElementById('f-dist').textContent.replace(' km (road distance)','').replace(' km','').trim()||haversine(STORE.lat,STORE.lng,pinLat,pinLng).toFixed(2);
   const mapsLink='https://www.google.com/maps?q='+pinLat+','+pinLng;
   const pdLabels={both:'Pickup & Delivery',pickup:'Pickup Only',delivery:'Delivery Only'};
 
