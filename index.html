@@ -188,8 +188,29 @@ footer{text-align:center;color:rgba(255,255,255,.2);font-size:12px;padding:16px 
     <input type="tel" id="phone" placeholder="09xx-xxx-xxxx"/>
   </div>
 
+  <!-- AUTH NOTICE -->
+  <div id="auth-notice" style="display:none;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:12px;padding:12px 16px;margin:8px 0;gap:10px;align-items:center;flex-wrap:wrap;">
+    <span style="font-size:20px;">👋</span>
+    <div style="flex:1;">
+      <p style="font-size:14px;font-weight:600;color:#1a3a8f;margin:0;">Welcome back, <span id="auth-name"></span>!</p>
+      <p style="font-size:12px;color:#3b82f6;margin:2px 0 0;">Details pre-filled from your account. <a href="account.html" style="color:#2563eb;">Manage account →</a></p>
+    </div>
+    <a href="#" onclick="logoutBooking();return false;" style="font-size:12px;color:#64748b;text-decoration:underline;">Not you?</a>
+  </div>
+
   <hr class="div"/>
   <div class="sec-head">📍 Location Details</div>
+
+  <!-- SAVED LOCATIONS -->
+  <div id="saved-locations-section" style="display:none;margin-bottom:14px;">
+    <div class="field">
+      <label>Use a saved location</label>
+      <select id="location-select" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:#f8fafc;color:var(--text);outline:none;">
+        <option value="">— Select a saved location (optional) —</option>
+      </select>
+      <p style="font-size:12px;color:var(--muted);margin-top:4px;">Or fill in the fields below manually.</p>
+    </div>
+  </div>
 
   <div class="field">
     <label>Address <span class="req">*</span></label>
@@ -319,8 +340,9 @@ footer{text-align:center;color:rgba(255,255,255,.2);font-size:12px;padding:16px 
   <p class="card-sub" style="margin-bottom:10px;">Comforters and pressing are charged separately per piece.</p>
   <div class="opt-grid cols3" style="margin-bottom:6px;">
     <div class="opt-btn" id="pp-cstd" onclick="togglePP(this,'cstd',300)"><span class="ob-label">🛏️ Comforter</span><span style="font-size:11px;color:var(--muted)">Double/Standard</span><span class="ob-price">₱300</span><span class="ob-note">per piece</span></div>
-    <div class="opt-btn" id="pp-cqueen" onclick="togglePP(this,'cqueen',350)"><span class="ob-label">🛏️ Comforter</span><span style="font-size:11px;color:var(--muted)">Queen Size</span><span class="ob-price">₱350</span><span class="ob-note">per piece</span></div>
-    <div class="opt-btn" id="pp-press" onclick="togglePP(this,'press',10)"><span class="ob-label">👔 Pressing</span><span style="font-size:11px;color:var(--muted)">&nbsp;</span><span class="ob-price">₱10</span><span class="ob-note">per piece</span></div>
+    <div class="opt-btn" id="pp-cqueen" onclick="togglePP(this,'cqueen',360)"><span class="ob-label">🛏️ Comforter</span><span style="font-size:11px;color:var(--muted)">Queen Size</span><span class="ob-price">₱350</span><span class="ob-note">per piece</span></div>
+    <div class="opt-btn" id="pp-press" onclick="togglePP(this,'press',15)"><span class="ob-label">👔 Pressing/Ironing</span><span style="font-size:11px;color:var(--muted)">&nbsp;</span><span class="ob-price">₱15</span><span class="ob-note">per piece</span></div>
+    <div class="opt-btn" id="pp-hanger" onclick="togglePP(this,'hanger',10)"><span class="ob-label">🪝 Hanger</span><span style="font-size:11px;color:var(--muted)">&nbsp;</span><span class="ob-price">₱10</span><span class="ob-note">per each</span></div>
   </div>
   <div id="pp-qty-wrap" style="display:none;background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid var(--border);"></div>
 
@@ -415,6 +437,29 @@ footer{text-align:center;color:rgba(255,255,255,.2);font-size:12px;padding:16px 
 </div>
 
 <!-- ⑥ SUMMARY + SUBMIT -->
+<!-- VOUCHER SECTION (shown if logged in with active vouchers) -->
+<div id="voucher-section" style="display:none;" class="card">
+  <div class="card-title"><span>🎟️</span> Apply Voucher</div>
+  <div class="field">
+    <select id="voucher-select" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;background:#f8fafc;color:var(--text);outline:none;">
+      <option value="">— Select a voucher (optional) —</option>
+    </select>
+  </div>
+  <div id="voucher-applied" style="display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:10px 14px;font-size:13px;color:#166534;">
+    🎉 Voucher applied! You save <strong id="voucher-discount">₱0</strong> off your service total.
+  </div>
+  <p style="font-size:12px;color:var(--muted);margin-top:8px;">Don't have an account? <a href="signup.html" style="color:var(--blue);">Sign up free</a> to earn vouchers!</p>
+</div>
+
+<!-- WEIGHT DISCLAIMER -->
+<div class="card" style="background:#fffbeb;border:1.5px solid #fcd34d;">
+  <div class="card-title" style="color:#92400e;"><span>⚖️</span> Important: Final weight at shop</div>
+  <p style="font-size:13px;color:#78350f;line-height:1.7;">
+    The final price for <strong>Premium Wash</strong> will be based on the <strong>actual weight measured at our shop</strong> when your laundry arrives — not an estimate. We will confirm the total before proceeding.<br/><br/>
+    For <strong>Standard Wash &amp; Standard Wash Plus</strong>, pricing is per load (8kg or 12kg) as selected.
+  </p>
+</div>
+
 <div class="card">
   <div class="card-title"><span>🧾</span> Order Summary</div>
   <div class="summary-box">
@@ -464,6 +509,35 @@ footer{text-align:center;color:rgba(255,255,255,.2);font-size:12px;padding:16px 
     Once confirmed, we'll send you a <strong style="color:rgba(255,255,255,.7)">GCash QR code</strong> for the non-refundable pickup security fee.<br/>
     Payment confirms your booking. Please avoid cancelling after payment.
   </p>
+  <!-- REVIEW SECTION -->
+  <div style="margin-top:28px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px;max-width:440px;margin-inline:auto;">
+    <p style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:white;margin-bottom:6px;">How was your booking experience?</p>
+    <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.5;">Your feedback helps us serve you better! Feel free to come back anytime. 🧺✨</p>
+    <div id="star-rating" style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;">
+      <span onclick="rateStar(1)" style="font-size:34px;cursor:pointer;filter:grayscale(1);transition:all 0.2s;" id="s1">⭐</span>
+      <span onclick="rateStar(2)" style="font-size:34px;cursor:pointer;filter:grayscale(1);transition:all 0.2s;" id="s2">⭐</span>
+      <span onclick="rateStar(3)" style="font-size:34px;cursor:pointer;filter:grayscale(1);transition:all 0.2s;" id="s3">⭐</span>
+      <span onclick="rateStar(4)" style="font-size:34px;cursor:pointer;filter:grayscale(1);transition:all 0.2s;" id="s4">⭐</span>
+      <span onclick="rateStar(5)" style="font-size:34px;cursor:pointer;filter:grayscale(1);transition:all 0.2s;" id="s5">⭐</span>
+    </div>
+    <div id="review-msg" style="display:none;">
+      <p id="review-text" style="font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:14px;line-height:1.6;text-align:center;"></p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <a href="https://g.page/r/CQsFTXs2R2h8EBM/review" target="_blank"
+          style="display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1a1a1a;text-decoration:none;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;">
+          <img src="https://www.google.com/favicon.ico" width="18" height="18" alt="Google"/> Leave us a Google Review ⭐
+        </a>
+        <a href="https://www.facebook.com/WashCraftLaundry/reviews" target="_blank"
+          style="display:flex;align-items:center;justify-content:center;gap:10px;background:#0866ff;color:white;text-decoration:none;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;">
+          👍 Leave us a Facebook Review
+        </a>
+      </div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:14px;line-height:1.6;text-align:center;">
+        We hope to see you again soon! 💙
+      </p>
+    </div>
+  </div>
+
   <button class="new-btn" onclick="resetForm()">+ Submit another booking</button>
 </div>
 
@@ -477,6 +551,101 @@ footer{text-align:center;color:rgba(255,255,255,.2);font-size:12px;padding:16px 
 </div>
 
 <script>
+// AUTH CHECK - pre-fill if logged in
+async function checkAuthAndPrefill(){
+  const token=localStorage.getItem('wc_token');
+  const email=localStorage.getItem('wc_email');
+  if(!token||!email)return;
+  const SURL='https://lzdvdoomxverukxrbknk.supabase.co';
+  const SKEY='sb_publishable_g4eml-nrxITD4nT1eNsA3w_iUHuFLAx';
+  try{
+    const r=await fetch(SURL+'/rest/v1/profiles?email=eq.'+encodeURIComponent(email)+'&select=*',{
+      headers:{'apikey':SKEY,'Authorization':'Bearer '+token}
+    });
+    const d=await r.json();
+    if(!d||!d[0])return;
+    const p=d[0];
+    document.getElementById('name').value=p.full_name||'';
+    document.getElementById('phone').value=p.phone||'';
+    // Show logged in notice
+    document.getElementById('auth-notice').style.display='flex';
+    document.getElementById('auth-name').textContent=p.nickname||p.full_name.split(' ')[0];
+    // Load active vouchers
+    const vr=await fetch(SURL+'/rest/v1/vouchers?user_id=eq.'+p.id+'&status=eq.active&select=*',{
+      headers:{'apikey':SKEY,'Authorization':'Bearer '+token}
+    });
+    const vd=await vr.json();
+    window._userProfileId=p.id;
+    window._userVouchers=vd||[];
+    if(vd&&vd.length>0){
+      document.getElementById('voucher-section').style.display='block';
+      const vSelect=document.getElementById('voucher-select');
+      vSelect.innerHTML='<option value="">— Select a voucher (optional) —</option>'+
+        vd.filter(v=>{
+          const exp=new Date(v.expires_at);
+          return exp>new Date()&&v.status==='active';
+        }).map(v=>{
+          const exp=new Date(v.expires_at).toLocaleDateString('en-PH');
+          return '<option value="'+v.id+'" data-amount="'+v.discount_amount+'" data-code="'+v.code+'">'+v.code+' — ₱'+v.discount_amount+' off (expires '+exp+')</option>';
+        }).join('');
+      vSelect.onchange=function(){
+        const opt=this.options[this.selectedIndex];
+        const amt=opt.dataset.amount;
+        if(amt){
+          document.getElementById('voucher-applied').style.display='block';
+          document.getElementById('voucher-discount').textContent='₱'+amt;
+          window._selectedVoucher={id:this.value,amount:parseFloat(amt),code:opt.dataset.code};
+        } else {
+          document.getElementById('voucher-applied').style.display='none';
+          window._selectedVoucher=null;
+        }
+        calcSummary();
+      };
+    }
+    // Load saved locations
+    const lr=await fetch(SURL+'/rest/v1/saved_locations?user_id=eq.'+p.id+'&select=*&order=is_default.desc',{
+      headers:{'apikey':SKEY,'Authorization':'Bearer '+token}
+    });
+    const ld=await lr.json();
+    if(ld&&ld.length>0){
+      document.getElementById('saved-locations-section').style.display='block';
+      const lSelect=document.getElementById('location-select');
+      lSelect.innerHTML='<option value="">— Use a saved location —</option>'+
+        ld.map(l=>'<option value="'+l.id+'" data-address="'+l.address+'" data-landmark="'+l.landmark+'" data-notes="'+l.rider_notes+'" data-lat="'+l.lat+'" data-lng="'+l.lng+'">'+(l.is_default?'⭐ ':'')+l.label+(l.address?' — '+l.address:'')+' '+(l.is_default?'(Default)':'')+'</option>').join('');
+      lSelect.onchange=function(){
+        const opt=this.options[this.selectedIndex];
+        if(opt.dataset.address){
+          document.getElementById('address').value=opt.dataset.address||'';
+          document.getElementById('landmark').value=opt.dataset.landmark||'';
+          document.getElementById('rider-notes').value=opt.dataset.notes||'';
+          if(opt.dataset.lat&&opt.dataset.lng&&map){
+            const lat=parseFloat(opt.dataset.lat);
+            const lng=parseFloat(opt.dataset.lng);
+            if(!isNaN(lat)&&!isNaN(lng)){
+              pinLat=lat;pinLng=lng;
+              document.getElementById('pin-lat').value=lat;
+              document.getElementById('pin-lng').value=lng;
+              if(marker)marker.setMap(null);
+              marker=new google.maps.Marker({position:{lat,lng},map,animation:google.maps.Animation.DROP,icon:{path:google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,scale:7,fillColor:'#2563eb',fillOpacity:1,strokeColor:'#fff',strokeWeight:2}});
+              map.panTo({lat,lng});
+              updateFee();
+            }
+          }
+        }
+      };
+    }
+  }catch(e){console.log('Auth prefill error:',e);}
+}
+checkAuthAndPrefill();
+
+// SHOW NAV AUTH LINKS
+const _tok=localStorage.getItem('wc_token');
+if(_tok){
+  document.getElementById('nav-account').style.display='inline-block';
+} else {
+  document.getElementById('nav-login').style.display='inline-block';
+}
+
 // BG ANIMATION
 (function(){
   const bg=document.getElementById('bg');
@@ -542,7 +711,7 @@ function setLoad(svc,el,load,price){
 
 // PER PIECE
 const PP={};
-const PP_LABELS={cstd:'Comforter (Dbl/Std)',cqueen:'Comforter (Queen)',press:'Pressing'};
+const PP_LABELS={cstd:'Comforter (Dbl/Std)',cqueen:'Comforter (Queen)',press:'Pressing/Ironing',hanger:'Hanger'};
 function togglePP(el,key,price){
   if(PP[key]){delete PP[key];el.classList.remove('active');}
   else{PP[key]={price,qty:1};el.classList.add('active');}
@@ -589,7 +758,7 @@ function adjAO(key,d){if(!AO[key])return;AO[key].qty=Math.max(1,AO[key].qty+d);d
 
 // MAP
 const STORE={lat:15.490481,lng:120.976506};
-let FREE_KM=1,FPK=10;
+let FREE_KM=0,FPK=20,MIN_FEE=20;
 const SUPABASE_URL='https://lzdvdoomxverukxrbknk.supabase.co';
 const SUPABASE_KEY='sb_publishable_g4eml-nrxITD4nT1eNsA3w_iUHuFLAx';
 async function loadPricing(){
@@ -598,7 +767,7 @@ async function loadPricing(){
       headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
     });
     const d=await r.json();
-    if(d&&d[0]){FREE_KM=d[0].free_km;FPK=d[0].pickup_fee;}
+    if(d&&d[0]){FREE_KM=0;FPK=d[0].pickup_fee;MIN_FEE=d[0].pickup_fee;}
   }catch(e){console.log('Using default pricing');}
 }
 loadPricing();
@@ -629,7 +798,11 @@ function updateFee(){
     origins:[new google.maps.LatLng(STORE.lat,STORE.lng)],
     destinations:[new google.maps.LatLng(pinLat,pinLng)],
     travelMode:google.maps.TravelMode.DRIVING,
-    unitSystem:google.maps.UnitSystem.METRIC
+    unitSystem:google.maps.UnitSystem.METRIC,
+    drivingOptions:{
+      departureTime:new Date(),
+      trafficModel:google.maps.TrafficModel.BEST_GUESS
+    }
   },function(response,status){
     let dist;
     if(status==='OK'&&response.rows[0].elements[0].status==='OK'){
@@ -638,33 +811,18 @@ function updateFee(){
       dist=haversine(STORE.lat,STORE.lng,pinLat,pinLng);
     }
     const roundedDist=Math.round(dist*10)/10;
-    const extra=Math.max(0,roundedDist-FREE_KM);
-    const fee=extra>0?Math.round(extra*10)/10*FPK:0;
+    const fee=Math.max(MIN_FEE, Math.round(roundedDist*10)/10*FPK);
     const pickupFee=pdType==='delivery'?0:fee;
     const deliveryFee=pdType==='pickup'?0:fee;
     delCharge=pickupFee+deliveryFee;
     document.getElementById('f-dist').textContent=roundedDist.toFixed(1)+' km';
-    const fmt=v=>v===0?'<span class="free-badge">FREE 🎉</span>':'\u20b1'+v;
+    const fmt=v=>'₱'+v;
     if(pdType!=='delivery') document.getElementById('f-pickup').innerHTML=fmt(pickupFee);
     if(pdType!=='pickup') document.getElementById('f-delivery').innerHTML=fmt(deliveryFee);
-    if(delCharge===0){
-      document.getElementById('fee-full-row').style.display='none';
-      document.getElementById('fee-discount-row').style.display='none';
-      document.getElementById('f-total').innerHTML='<span class="free-badge">FREE \u2014 within 1 km! \ud83c\udf89</span>';
-    } else {
-      const fullCharge=Math.round(roundedDist*FPK*10)/10;
-      const discountCharge=FREE_KM>0?Math.round(FREE_KM*FPK*10)/10:0;
-      if(discountCharge>0){
-        document.getElementById('fee-full-row').style.display='flex';
-        document.getElementById('f-full').textContent='\u20b1'+fullCharge.toFixed(0)+' ('+roundedDist.toFixed(1)+' km \u00d7 \u20b1'+FPK+')';
-        document.getElementById('fee-discount-row').style.display='flex';
-        document.getElementById('f-discount').textContent='-\u20b1'+discountCharge.toFixed(0)+' ('+FREE_KM+' km free)';
-      } else {
-        document.getElementById('fee-full-row').style.display='none';
-        document.getElementById('fee-discount-row').style.display='none';
-      }
-      document.getElementById('f-total').textContent='\u20b1'+delCharge;
-    }
+    // Hide discount row - no more free km
+    document.getElementById('fee-full-row').style.display='none';
+    document.getElementById('fee-discount-row').style.display='none';
+    document.getElementById('f-total').textContent='₱'+delCharge+' (min. ₱20 each way)';
     calcSummary();
   });
 }
@@ -783,7 +941,31 @@ function submitBooking(){
   }).catch(err=>console.log('Submission error:',err));
 }
 function markErr(id){const el=document.getElementById(id);el.classList.add('err');el.addEventListener('input',()=>el.classList.remove('err'),{once:true});}
+function logoutBooking(){
+  localStorage.removeItem('wc_token');
+  localStorage.removeItem('wc_email');
+  localStorage.removeItem('wc_profile');
+  location.reload();
+}
+
 function resetForm(){document.getElementById('booking-form').style.display='block';document.getElementById('success-screen').style.display='none';window.scrollTo({top:0,behavior:'smooth'});}
+
+function rateStar(val){
+  for(let i=1;i<=5;i++){
+    const s=document.getElementById('s'+i);
+    s.style.filter=i<=val?'grayscale(0)':'grayscale(1)';
+    s.style.transform=i<=val?'scale(1.2)':'scale(1)';
+  }
+  const msgs={
+    1:'We\'re sorry to hear that. We\'ll do better next time! 💙',
+    2:'Thank you for your feedback. We\'ll keep improving! 💙',
+    3:'Thank you! We hope to make your next experience even better! 😊',
+    4:'So glad you had a good experience! We appreciate you! 🧺✨',
+    5:'Thank you so much! You just made our day! 🎉🧺✨'
+  };
+  document.getElementById('review-text').textContent=msgs[val];
+  document.getElementById('review-msg').style.display='block';
+}
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDyA890-zY159gPGCh_OvHN7XFNyt8hj2Y&callback=initMap" async defer></script>
 </body>

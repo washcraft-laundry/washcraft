@@ -117,19 +117,19 @@ input:focus{border-color:var(--bright);box-shadow:0 0 0 3px rgba(37,99,235,.12);
 
     <div id="settings-form">
       <div class="setting-row">
-        <div class="setting-label">Free delivery radius</div>
+        <div class="setting-label">Minimum fee per trip</div>
         <div class="setting-input-wrap">
           <input type="number" id="free-km" min="0" step="0.5" value="1" oninput="updatePreview()"/>
-          <span>km from store</span>
+          <span>₱ minimum (charged even under 1 km)</span>
         </div>
-        <p class="setting-desc">Customers within this distance pay no pickup or delivery fee.</p>
+        <p class="setting-desc">Minimum charge per pickup or delivery trip.</p>
       </div>
 
       <div class="setting-row">
         <div class="setting-label">Fee per km — pickup</div>
         <div class="setting-input-wrap">
           <span>₱</span>
-          <input type="number" id="pickup-fee" min="0" step="5" value="10" oninput="updatePreview()"/>
+          <input type="number" id="pickup-fee" min="0" step="5" value="20" oninput="updatePreview()"/>
           <span>per km after free zone</span>
         </div>
       </div>
@@ -138,7 +138,7 @@ input:focus{border-color:var(--bright);box-shadow:0 0 0 3px rgba(37,99,235,.12);
         <div class="setting-label">Fee per km — delivery</div>
         <div class="setting-input-wrap">
           <span>₱</span>
-          <input type="number" id="delivery-fee" min="0" step="5" value="10" oninput="updatePreview()"/>
+          <input type="number" id="delivery-fee" min="0" step="5" value="20" oninput="updatePreview()"/>
           <span>per km after free zone</span>
         </div>
       </div>
@@ -154,7 +154,55 @@ input:focus{border-color:var(--bright);box-shadow:0 0 0 3px rgba(37,99,235,.12);
     </div>
   </div>
 
-  <div class="link-card">
+  
+  <!-- CUSTOMER LIST -->
+  <div class="card" style="margin-top:14px;">
+    <div class="card-title">👥 Customers</div>
+    <p class="card-sub">All signed-up customers. Select to assign vouchers.</p>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <button onclick="loadCustomers()" style="font-size:13px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);cursor:pointer;color:var(--color-text-primary);">🔄 Refresh list</button>
+      <button onclick="selectAll()" style="font-size:13px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--color-border-info);background:var(--color-background-info);cursor:pointer;color:var(--color-text-info);">Select all</button>
+      <button onclick="deselectAll()" style="font-size:13px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);cursor:pointer;color:var(--color-text-secondary);">Deselect all</button>
+    </div>
+    <div id="customer-list" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;"></div>
+    <p id="customer-count" style="font-size:12px;color:var(--color-text-secondary);margin-top:8px;"></p>
+  </div>
+
+  <!-- ASSIGN VOUCHER -->
+  <div class="card" style="margin-top:14px;">
+    <div class="card-title">🎟️ Assign voucher to selected customers</div>
+    <p class="card-sub">Create and assign a voucher to all selected customers at once.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">Voucher code</label>
+        <input type="text" id="v-code" placeholder="e.g. SPECIAL50" style="width:100%;padding:10px 14px;border:1.5px solid var(--color-border-tertiary);border-radius:10px;font-size:15px;"/>
+        <p style="font-size:12px;color:var(--color-text-secondary);margin-top:4px;">Or <button onclick="genCode()" style="background:none;border:none;color:var(--color-text-info);cursor:pointer;font-size:12px;text-decoration:underline;">auto-generate a code</button></p>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">Discount amount (₱)</label>
+        <input type="number" id="v-amount" value="20" min="1" style="width:100%;padding:10px 14px;border:1.5px solid var(--color-border-tertiary);border-radius:10px;font-size:15px;"/>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">Description</label>
+        <input type="text" id="v-desc" placeholder="e.g. Special promo for loyal customers" style="width:100%;padding:10px 14px;border:1.5px solid var(--color-border-tertiary);border-radius:10px;font-size:15px;"/>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">Expiry date</label>
+        <input type="date" id="v-expiry" style="width:100%;padding:10px 14px;border:1.5px solid var(--color-border-tertiary);border-radius:10px;font-size:15px;"/>
+      </div>
+      <button onclick="assignVouchers()" style="width:100%;padding:14px;background:linear-gradient(135deg,#1a3a8f,#2563eb);color:white;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">🎟️ Assign voucher to selected customers</button>
+      <div id="assign-result" style="display:none;padding:12px;border-radius:10px;font-size:14px;text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- VOUCHER LOG -->
+  <div class="card" style="margin-top:14px;">
+    <div class="card-title">📋 All vouchers issued</div>
+    <button onclick="loadAllVouchers()" style="font-size:13px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);cursor:pointer;color:var(--color-text-primary);margin-bottom:12px;">🔄 Load vouchers</button>
+    <div id="voucher-log" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;"></div>
+  </div>
+
+<div class="link-card">
     <p>🌐 Your live booking page</p>
     <a href="https://washcraft-laundry.github.io/washcraft/" target="_blank">washcraft-laundry.github.io/washcraft/ ↗</a>
   </div>
@@ -241,20 +289,18 @@ async function saveSettings(){
 }
 
 function updatePreview(){
-  const freeKm=parseFloat(document.getElementById('free-km').value)||1;
-  const pFee=parseFloat(document.getElementById('pickup-fee').value)||0;
-  const dFee=parseFloat(document.getElementById('delivery-fee').value)||0;
+  const minFee=parseFloat(document.getElementById('free-km').value)||20;
+  const pFee=parseFloat(document.getElementById('pickup-fee').value)||20;
+  const dFee=parseFloat(document.getElementById('delivery-fee').value)||20;
   const rows=document.getElementById('preview-rows');
-  const examples=[1,2,3,5,10];
+  const examples=[0.5,1,2,3,5,10];
   rows.innerHTML=examples.map(km=>{
-    const extra=Math.max(0,km-freeKm);
-    const pickupCharge=extra>0?Math.ceil(extra)*pFee:0;
-    const deliveryCharge=extra>0?Math.ceil(extra)*dFee:0;
+    const pickupCharge=Math.max(minFee, Math.round(km*10)/10*pFee);
+    const deliveryCharge=Math.max(minFee, Math.round(km*10)/10*dFee);
     const total=pickupCharge+deliveryCharge;
-    const isFree=total===0;
     return `<div class="preview-row">
       <span>${km} km away</span>
-      <span>${isFree?'<span class="free-tag">FREE</span>':'₱'+total+' total (₱'+pickupCharge+' pickup + ₱'+deliveryCharge+' delivery)'}</span>
+      <span>₱${total} total (₱${pickupCharge} pickup + ₱${deliveryCharge} delivery)</span>
     </div>`;
   }).join('');
 }
@@ -262,6 +308,117 @@ function updatePreview(){
 // Focus password on load
 document.getElementById('password').focus();
 updatePreview();
+
+const SUPABASE_URL_ADM='https://lzdvdoomxverukxrbknk.supabase.co';
+const SUPABASE_KEY_ADM='sb_publishable_g4eml-nrxITD4nT1eNsA3w_iUHuFLAx';
+let selectedCustomers=[];
+let allCustomers=[];
+
+async function loadCustomers(){
+  const r=await fetch(SUPABASE_URL_ADM+'/rest/v1/profiles?select=*&order=created_at.desc',{
+    headers:{'apikey':SUPABASE_KEY_ADM,'Authorization':'Bearer '+SUPABASE_KEY_ADM}
+  });
+  allCustomers=await r.json();
+  const list=document.getElementById('customer-list');
+  document.getElementById('customer-count').textContent=allCustomers.length+' customer'+(allCustomers.length!==1?'s':'')+' registered';
+  if(!allCustomers.length){list.innerHTML='<p style="font-size:13px;color:var(--color-text-secondary);text-align:center;padding:20px;">No customers yet.</p>';return;}
+  list.innerHTML=allCustomers.map(c=>`
+    <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--color-background-secondary);border-radius:10px;cursor:pointer;border:1.5px solid var(--color-border-tertiary);">
+      <input type="checkbox" value="${c.id}" onchange="toggleCustomer('${c.id}')" style="width:16px;height:16px;accent-color:#2563eb;"/>
+      <div style="flex:1;">
+        <p style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin:0;">${c.full_name||'—'}${c.nickname?' ('+c.nickname+')':''}</p>
+        <p style="font-size:12px;color:var(--color-text-secondary);margin:2px 0 0;">@${c.username||'—'} · ${c.email||''} · ${c.phone||''}</p>
+        <p style="font-size:11px;color:var(--color-text-tertiary);margin:1px 0 0;">Joined: ${new Date(c.created_at).toLocaleDateString('en-PH')}</p>
+      </div>
+    </label>`).join('');
+}
+
+function toggleCustomer(id){
+  if(selectedCustomers.includes(id))selectedCustomers=selectedCustomers.filter(x=>x!==id);
+  else selectedCustomers.push(id);
+}
+
+function selectAll(){
+  selectedCustomers=allCustomers.map(c=>String(c.id));
+  document.querySelectorAll('#customer-list input[type=checkbox]').forEach(cb=>{cb.checked=true;});
+}
+
+function deselectAll(){
+  selectedCustomers=[];
+  document.querySelectorAll('#customer-list input[type=checkbox]').forEach(cb=>{cb.checked=false;});
+}
+
+function genCode(){
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code='WC-';
+  for(let i=0;i<6;i++)code+=chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('v-code').value=code;
+}
+
+async function assignVouchers(){
+  const code=document.getElementById('v-code').value.trim().toUpperCase();
+  const amount=parseFloat(document.getElementById('v-amount').value)||20;
+  const desc=document.getElementById('v-desc').value.trim();
+  const expiry=document.getElementById('v-expiry').value;
+  const result=document.getElementById('assign-result');
+
+  if(!code){alert('Please enter a voucher code.');return;}
+  if(!expiry){alert('Please set an expiry date.');return;}
+  if(selectedCustomers.length===0){alert('Please select at least one customer.');return;}
+
+  const expiresAt=new Date(expiry+'T23:59:59').toISOString();
+  let success=0;
+
+  for(const userId of selectedCustomers){
+    try{
+      await fetch(SUPABASE_URL_ADM+'/rest/v1/vouchers',{
+        method:'POST',
+        headers:{'apikey':SUPABASE_KEY_ADM,'Authorization':'Bearer '+SUPABASE_KEY_ADM,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({user_id:userId,code:code+'-'+userId.toString().slice(-4),discount_amount:amount,expires_at:expiresAt,status:'active',description:desc})
+      });
+      success++;
+    }catch(e){}
+  }
+
+  result.style.display='block';
+  result.style.background='#f0fdf4';
+  result.style.color='#166534';
+  result.textContent='✅ Voucher assigned to '+success+' customer'+(success!==1?'s':'')+'!';
+  setTimeout(()=>result.style.display='none',4000);
+}
+
+async function loadAllVouchers(){
+  const r=await fetch(SUPABASE_URL_ADM+'/rest/v1/vouchers?select=*&order=created_at.desc',{
+    headers:{'apikey':SUPABASE_KEY_ADM,'Authorization':'Bearer '+SUPABASE_KEY_ADM}
+  });
+  const data=await r.json();
+  const log=document.getElementById('voucher-log');
+  if(!data.length){log.innerHTML='<p style="font-size:13px;color:var(--color-text-secondary);text-align:center;padding:20px;">No vouchers issued yet.</p>';return;}
+  const now=new Date();
+  log.innerHTML=data.map(v=>{
+    const exp=new Date(v.expires_at);
+    const expired=exp<now;
+    const statusColor=v.status==='used'?'#059669':expired?'#ef4444':'#2563eb';
+    const statusLabel=v.status==='used'?'Used':expired?'Expired':'Active';
+    return `<div style="padding:10px 12px;background:var(--color-background-secondary);border-radius:10px;border:1.5px solid var(--color-border-tertiary);">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <span style="font-family:monospace;font-weight:700;font-size:14px;color:var(--color-text-primary);">${v.code}</span>
+          <span style="margin-left:8px;background:${statusColor};color:white;font-size:11px;padding:2px 8px;border-radius:20px;">${statusLabel}</span>
+        </div>
+        <span style="font-size:16px;font-weight:700;color:#f59e0b;">₱${v.discount_amount}</span>
+      </div>
+      <p style="font-size:12px;color:var(--color-text-secondary);margin:4px 0 0;">${v.description||''} · Expires: ${exp.toLocaleDateString('en-PH')} · Customer ID: ${v.user_id}</p>
+    </div>`;
+  }).join('');
+}
+
+// Set default expiry to 30 days from now
+const d=new Date();d.setDate(d.getDate()+30);
+document.getElementById('v-expiry').value=d.toISOString().split('T')[0];
+
+// Auto-load customers on login
+loadCustomers();
 </script>
 </body>
 </html>
